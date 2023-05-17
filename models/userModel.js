@@ -1,7 +1,11 @@
 import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema({
-  fullname: {
+  name: {
+    type: String,
+    required: true,
+  },
+  surname: {
     type: String,
     required: true,
   },
@@ -11,15 +15,6 @@ const userSchema = mongoose.Schema({
     unique: true,
   },
   password: {
-    type: String,
-    required: true,
-  },
-  userType: {
-    type: String,
-    enum: ["USER", "ADMIN"],
-    default: "USER",
-  },
-  phoneNumber: {
     type: String,
     required: true,
   },

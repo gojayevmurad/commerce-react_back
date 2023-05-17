@@ -1,22 +1,21 @@
 import express from "express";
-import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import User from "../Models/userModel.js";
 
 const router = express.Router();
 
-// localhost:5000/users (POST)
+// localhost:5000/auth/user/register (POST)
 
-router.post("/signup", async (req, res) => {
+router.post("/user/register", async (req, res) => {
   try {
-    console.log(req.body);
-    const { fullname, password, phoneNumber, email } = req.body;
+
+    const { name, password, surname, email } = req.body;
 
     // Check if user already exists
     const userExist = await User.findOne({ email });
 
     if (userExist) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: "Bu istifadəçi sistemdə mövcuddur" });
     }
 
     // Hash password
@@ -26,40 +25,42 @@ router.post("/signup", async (req, res) => {
     // Create new user
 
     const createdUser = await User.create({
-      fullname,
+      name,
+      surname,
       email,
       password: hashedPassword,
-      phoneNumber,
     });
 
-    res.status(201).json(createdUser);
+    res.status(201).json({ message: "Hesabınız yaradıldı" });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: err.message });
   }
 });
 
-// localhost:5000/users/signin (POST)
+// localhost:5000/auth/user/login (POST)
 
-router.post("/signin", async (req, res) => {
+router.post("/user/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({ message: "User does not exist" });
+      return res.status(400).json({ message: "İstifadəçi mövcud deyil" });
     }
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
     if (!isPasswordCorrect) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: "Şifrə yanlışdır" });
     }
 
     return res
       .status(200)
-      .json({ user, message: "User signed in successfully" });
-  } catch (err) {}
+      .json({ data: user, message: "İstifadəçi girişi uğurla tamamlandı" });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
 });
 
 export default router;
