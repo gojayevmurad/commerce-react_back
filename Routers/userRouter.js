@@ -1,5 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
 import User from "../Models/userModel.js";
 
 const router = express.Router();
@@ -33,7 +35,6 @@ router.post("/user/register", async (req, res) => {
 
     res.status(201).json({ message: "Hesabınız yaradıldı" });
   } catch (err) {
-    console.log(err);
     res.status(500).json({ message: err.message });
   }
 });
@@ -55,9 +56,13 @@ router.post("/user/login", async (req, res) => {
       return res.status(400).json({ message: "Şifrə yanlışdır" });
     }
 
+    const accessToken = jwt.sign({ name: user.name }, process.env.SECRET_KEY, { expiresIn: '15m' });
+    const refreshToken = jwt.sign({ name: user.name }, process.env.REFRESH_KEY, { expiresIn: '30d' });
+
     return res
       .status(200)
-      .json({ data: user, message: "İstifadəçi girişi uğurla tamamlandı" });
+      .json({ data: { accessToken: accessToken, refreshToken: refreshToken }, message: "İstifadəçi girişi uğurla tamamlandı" });
+
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
