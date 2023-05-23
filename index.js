@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import userRouter from "./Routers/userRouter.js";
 import productRouter from "./Routers/productRouter.js";
+import basketRouter from "./Routers/basketRouter.js"
 import cors from "cors";
 
 dotenv.config();
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/auth", userRouter);
 app.use("/products", productRouter);
+app.use("/basket", basketRouter)
 
 app.listen(process.env.PORT, () => {
   mongoose

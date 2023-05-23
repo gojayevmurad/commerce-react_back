@@ -43,9 +43,9 @@ router.get('/', async (req, res) => {
     try {
         const params = req.query;
 
-        const limit = params.limit ? parseInt(params.limit) : 5;
+        const limit = params.limit ? parseInt(params.limit) : 6;
         const page = params.page ? parseInt(params.page) : 1;
-        const sort = params.sort ? params.sort : null;
+        const sort = params.sort ? params.sort : 'order_count';
         const rating = params.rating ? params.rating : 1.5;
         const category = params.category ? params.category : null;
         const price = params.price ? params.price : null;
@@ -59,9 +59,9 @@ router.get('/', async (req, res) => {
         const totalCount = await Product.countDocuments(findData);
         const products = await Product.find(findData).sort({ [sort]: 'desc' }).skip((page - 1) * limit).limit(limit)
 
-        res.status(200).json({ data: products, totalCount })
+        return res.status(200).json({ data: products, totalCount })
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        return res.status(500).json({ message: err.message });
     }
 });
 

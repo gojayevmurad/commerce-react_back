@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import User from "../Models/userModel.js";
+import { refreshToken } from "../utils/jwt.js";
 
 const router = express.Router();
 
@@ -56,8 +57,8 @@ router.post("/user/login", async (req, res) => {
       return res.status(400).json({ message: "Şifrə yanlışdır" });
     }
 
-    const accessToken = jwt.sign({ name: user.name }, process.env.SECRET_KEY, { expiresIn: '15m' });
-    const refreshToken = jwt.sign({ name: user.name }, process.env.REFRESH_KEY, { expiresIn: '30d' });
+    const accessToken = jwt.sign({ user: user._id }, process.env.SECRET_KEY, { expiresIn: '15m' });
+    const refreshToken = jwt.sign({ user: user._id }, process.env.REFRESH_KEY, { expiresIn: '30d' });
 
     return res
       .status(200)
@@ -67,5 +68,18 @@ router.post("/user/login", async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 });
+
+// localhost:5000/auth/user/refresh-token (POST)
+router.post('/user/refresh-token', refreshToken, async (req, res) => {
+  try {
+    const userId = req.data.user;
+
+    const accessToken = jwt.sign({ user: userId }, process.env.SECRET_KEY, { expiresIn: '15m' });
+
+    return res.status(200).json({ data: { accessToken: accessToken } })
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+})
 
 export default router;
