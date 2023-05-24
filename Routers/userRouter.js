@@ -2,8 +2,8 @@ import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-import User from "../Models/userModel.js";
-import { refreshToken } from "../utils/jwt.js";
+import User from "../models/userModel.js";
+import { authenticateToken, refreshToken } from "../utils/jwt.js";
 
 const router = express.Router();
 
@@ -77,6 +77,33 @@ router.post('/user/refresh-token', refreshToken, async (req, res) => {
     const accessToken = jwt.sign({ user: userId }, process.env.SECRET_KEY, { expiresIn: '15m' });
 
     return res.status(200).json({ data: { accessToken: accessToken } })
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+})
+
+
+// localhost:5000/auth/user/change-password (PUT)
+
+router.put('/user/change-password', authenticateToken, async (req, res) => {
+  try {
+
+    const userId = req.data.user;
+    const { password, newPassword } = req.body;
+
+    const user = await User.findById(userId, 'password');
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordCorrect) return res.status(400).json({ message: "Şifrə yanlışdır" });
+
+    const newHashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = newHashedPassword;
+
+    await user.save();
+
+    return res.status(200).json({ message: "Şifrə uğurla dəyişdirildi" })
+
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
