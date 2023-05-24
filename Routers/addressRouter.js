@@ -4,6 +4,17 @@ import { authenticateToken } from "../utils/jwt.js";
 
 const router = express.Router();
 
+router.get('/', authenticateToken, async (req, res) => {
+    try {
+        let userId = req.data.user;
+
+        let user = await User.findOne({ _id: userId }, 'addresses');
+
+        return res.status(200).json({ data: user.addresses });
+    } catch (error) {
+        return res.status(401).json({ error: error.message })
+    }
+})
 
 router.post('/', authenticateToken, async (req, res) => {
     try {
@@ -14,13 +25,13 @@ router.post('/', authenticateToken, async (req, res) => {
 
         const isDefault = user.addresses[typeAddress].length > 0 ? false : true;
 
-        user.addresses.shippingAdress = {
+        user.addresses[typeAddress].push({
             name, address, city, postalCode, isDefault
-        }
+        })
 
         await user.save()
 
-        return res.status(200).json({ user: user })
+        return res.status(200).json({ data: user.addresses })
     } catch (error) {
         return res.status(401).json({ error: error.message })
     }

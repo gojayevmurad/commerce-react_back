@@ -27,8 +27,8 @@ const userSchema = mongoose.Schema({
     required: true,
   },
   addresses: {
-    shippingAdress: [addressSchema],
-    billingAdress: [addressSchema]
+    shippingAddress: [addressSchema],
+    billingAddress: [addressSchema]
   }
 });
 
