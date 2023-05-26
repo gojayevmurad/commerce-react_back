@@ -37,5 +37,25 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 })
 
+router.delete('/:id/:type', authenticateToken, async (req, res) => {
+    try {
+
+        const userId = req.data.user;
+        const addressId = req.params.id;
+        const type = req.params.type;
+
+        const user = await User.findOne({ _id: userId }, 'addresses');
+
+        user.addresses[type].splice(user.addresses[type].findIndex(item => item._id == addressId), 1)
+
+        await user.save();
+
+        return res.status(200).json({ data: user.addresses, message: 'Ünvan uğurla silindi' })
+
+    } catch (error) {
+        return res.status(500).json({ message: error.message })
+    }
+})
+
 
 export default router;

@@ -9,7 +9,7 @@ router.get('/single_product', async (req, res) => {
         const product = await Product.findById(id);
         return res.status(200).json(product);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        return res.status(500).json({ message: err.message });
     }
 })
 
@@ -84,6 +84,7 @@ router.get('/popular-sales', async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+
 
 export default router;
 

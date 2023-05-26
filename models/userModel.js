@@ -29,7 +29,11 @@ const userSchema = mongoose.Schema({
   addresses: {
     shippingAddress: [addressSchema],
     billingAddress: [addressSchema]
-  }
+  },
+  favorites: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product'
+  }]
 });
 
 export default mongoose.model("User", userSchema);
