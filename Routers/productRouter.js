@@ -3,11 +3,11 @@ import Product from "../models/productModel.js";
 
 const router = express.Router();
 
-router.get('/single_product', async (req, res) => {
+router.get('/single-product/:id', async (req, res) => {
     try {
-        const id = req.query.id;
+        const id = req.params.id;
         const product = await Product.findById(id);
-        return res.status(200).json(product);
+        return res.status(200).json({ data: product });
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }
