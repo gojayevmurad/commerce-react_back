@@ -1,6 +1,7 @@
 import express from "express";
 import Basket from "../models/basketModel.js";
 import { authenticateToken } from "../utils/jwt.js";
+import Product from "../models/productModel.js";
 
 const router = express.Router();
 
@@ -77,6 +78,33 @@ router.get('/get-items', authenticateToken, async (req, res) => {
         if (basket) return res.status(200).json({ data: basket.items })
 
         return res.status(200).json({ data: [] })
+
+    } catch (error) {
+        return res.status(400).json({ message: error.message })
+    }
+})
+
+
+router.get('/get-products-data', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.data.user;
+        const basket = await Basket.findOne({ userId: userId });
+
+        if (basket) {
+
+            let list = [];
+
+            basket.items.forEach(element => {
+                list.push(element.product)
+            });
+
+            const products = await Product.find({ _id: { $in: list } })
+
+
+            return res.status(200).json({ data: products })
+        }
+
+        return 
 
     } catch (error) {
         return res.status(400).json({ message: error.message })
