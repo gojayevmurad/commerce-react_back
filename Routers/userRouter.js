@@ -57,7 +57,7 @@ router.post("/user/login", async (req, res) => {
       return res.status(400).json({ message: "Şifrə yanlışdır" });
     }
 
-    const accessToken = jwt.sign({ user: user._id }, process.env.SECRET_KEY, { expiresIn: '15m' });
+    const accessToken = jwt.sign({ user: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
     const refreshToken = jwt.sign({ user: user._id }, process.env.REFRESH_KEY, { expiresIn: '30d' });
 
     return res
@@ -74,7 +74,7 @@ router.post('/user/refresh-token', refreshToken, async (req, res) => {
   try {
     const userId = req.data.user;
 
-    const accessToken = jwt.sign({ user: userId }, process.env.SECRET_KEY, { expiresIn: '15m' });
+    const accessToken = jwt.sign({ user: userId }, process.env.SECRET_KEY, { expiresIn: '1d' });
 
     return res.status(200).json({ data: { accessToken: accessToken } })
   } catch (error) {
